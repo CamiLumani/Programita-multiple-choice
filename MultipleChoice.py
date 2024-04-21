@@ -27,8 +27,9 @@ Examenes = st.number_input('Examenes:', min_value=1, max_value=1000, value=None)
 st.markdown("**4. Ingrese un encabezado para los archivos:**")
 Encabezado= st.text_input("Encabezado")
 
-st.header("Generar los archivos", divider="grey")
+st.header("Generar los exámenes", divider="grey")
 def generararchivo(df, CantPreguntas, num_examen,titulo):
+    pregunta_column = df.columns[0]
     Random = df.sample(CantPreguntas)
     Elementos = []
     numpregunta = 1
@@ -46,7 +47,7 @@ def generararchivo(df, CantPreguntas, num_examen,titulo):
     Elementos.append(Spacer(1, 12))
 
     for index, row in Random.iterrows():
-        Pregunta = row['Pregunta']
+        Pregunta = row[pregunta_column]
         respuestas = row.iloc[1:]
         respuestas_aleatorias = respuestas.sample(frac=1) 
 
