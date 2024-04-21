@@ -88,5 +88,10 @@ if st.button('Generar archivos'):
         st.warning("Por favor, suba un archivo de preguntas antes de generar los exámenes.")
         
     st.markdown("**Suerte con las correcciones** :balloon:	:clinking_glasses: ")
+    
+    st.markdown("*- Sugerencias de mejora: camilumani@gmail.com -*")
+
+
+
 
 
