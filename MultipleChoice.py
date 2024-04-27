@@ -49,8 +49,8 @@ def generararchivo(df, CantPreguntas, num_examen,titulo):
     for index, row in Random.iterrows():
         Pregunta = row[pregunta_column]
         respuestas = row.iloc[1:]
-        respuestas_aleatorias = respuestas.sample(frac=1) 
-
+        respuestas_aleatorias = respuestas.dropna().sample(frac=1) 
+        
         Formato_Pregunta = f"<strong>{numpregunta}.{Pregunta}</strong><br/>"
         Formato_Respuesta = []
         for i, rta in enumerate(respuestas_aleatorias):
