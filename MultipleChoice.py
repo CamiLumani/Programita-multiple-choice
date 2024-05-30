@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import letter, A4, landscape, legal
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
 from Descarga import download_button
 import os
 import zipfile
@@ -27,6 +28,18 @@ Examenes = st.number_input('Examenes:', min_value=1, max_value=1000, value=None)
 st.markdown("**4. Ingrese un encabezado para los archivos:**")
 Encabezado= st.text_input("Encabezado")
 
+
+st.header("Configuración del archivo de salida", divider="grey")
+st.markdown("**5. Seleccione el tamaño de la hoja:**")
+OpcionesPagina = {"Carta": letter, "A4": A4, "Oficio": legal, "A4 - Horizontal": landscape(A4)}
+TamañoPagina = st.selectbox("Tamaño de la hoja:", list(OpcionesPagina.keys()))
+
+st.markdown("**6. Ingrese el tamaño de la fuente del título:**")
+TamañoTitulo = st.number_input('Tamaño del título:', min_value=8, max_value=100, value=15)
+
+st.markdown("**7. Ingrese el tamaño de la fuente de las preguntas y respuestas:**")
+TamañoPreguntas = st.number_input('Tamaño de la fuente de preguntas y respuestas:', min_value=8, max_value=100, value=10)
+
 st.header("Generar los exámenes", divider="grey")
 def generararchivo(df, CantPreguntas, num_examen,titulo):
     pregunta_column = df.columns[0]
@@ -36,16 +49,16 @@ def generararchivo(df, CantPreguntas, num_examen,titulo):
     
     _, temp_file_path = tempfile.mkstemp(suffix='.pdf')
 
-    doc = SimpleDocTemplate(temp_file_path, pagesize=letter)
+    doc = SimpleDocTemplate(temp_file_path,pagesize=OpcionesPagina[TamañoPagina])
 
     
-    estilo_encabezado = ParagraphStyle(name='Encabezado', fontSize=20)
+    estilo_encabezado = ParagraphStyle(name='Encabezado', fontSize=TamañoTitulo,leading=TamañoTitulo+1)
+    estilo_texto = ParagraphStyle(name='Texto', fontSize=TamañoPreguntas, leading=TamañoPreguntas+1)
     
     Elementos.append(Paragraph(f"<strong>{titulo}</strong> ", estilo_encabezado))
     
-    Elementos.append(Spacer(1, 12))
-    Elementos.append(Spacer(1, 12))
-
+    Elementos.append(Spacer(1, TamañoTitulo))
+    
     for index, row in Random.iterrows():
         Pregunta = row[pregunta_column]
         respuestas = row.iloc[1:]
@@ -57,15 +70,15 @@ def generararchivo(df, CantPreguntas, num_examen,titulo):
             if pd.notna(rta):
                 Formato_Respuesta.append(f"{chr(97 + i)}. {rta}")
 
-        Elementos.append(Paragraph(Formato_Pregunta, getSampleStyleSheet()["BodyText"]))
+        Elementos.append(Paragraph(Formato_Pregunta, estilo_texto))
         for rta in Formato_Respuesta:
-            Elementos.append(Paragraph(rta, getSampleStyleSheet()["BodyText"]))
+            Elementos.append(Paragraph(rta, estilo_texto))
 
-        Elementos.append(Spacer(1, 12))
+        Elementos.append(Spacer(1, 6))
         numpregunta += 1
 
     Nombre_archivo = f"Examen_{num_examen}.pdf"
-    doc = SimpleDocTemplate(Nombre_archivo, pagesize=letter)
+    doc = SimpleDocTemplate(Nombre_archivo,pagesize=OpcionesPagina[TamañoPagina])
     doc.build(Elementos)
     return Nombre_archivo
 
